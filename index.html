@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Road to P1 Dynamics</title>
+  <style>
+    :root{
+      --bg:#090d12;--panel:#111821;--panel2:#17212d;--text:#f4f7fb;--muted:#9cabba;
+      --accent:#f4c430;--line:#263342;--good:#32d583;--bad:#ff5f57;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#070a0e,#0c1219 55%,#091017);color:var(--text);
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
+    header{padding:22px 18px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;
+      background:rgba(9,13,18,.94);backdrop-filter:blur(10px);z-index:4}
+    .brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:auto}
+    .mark{width:46px;height:46px;border-radius:14px;background:var(--accent);color:#111;display:grid;
+      place-items:center;font-weight:900;font-size:20px;box-shadow:0 8px 30px rgba(244,196,48,.22)}
+    h1{font-size:20px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:3px}
+    main{max-width:1100px;margin:auto;padding:18px;display:grid;gap:16px}
+    .hero{background:radial-gradient(circle at 85% 15%,rgba(244,196,48,.17),transparent 34%),var(--panel);
+      border:1px solid var(--line);border-radius:22px;padding:20px}
+    .hero h2{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.5}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
+    .card h3{margin:0 0 12px;font-size:16px}
+    label{display:block;color:var(--muted);font-size:13px;margin:12px 0 7px}
+    select,input{width:100%;background:var(--panel2);color:var(--text);border:1px solid #334255;
+      border-radius:12px;padding:13px;font-size:15px}
+    button{border:0;border-radius:13px;padding:13px 16px;font-weight:800;font-size:15px;cursor:pointer}
+    .primary{width:100%;margin-top:15px;background:var(--accent);color:#111}
+    .secondary{background:var(--panel2);color:var(--text);border:1px solid #334255}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .stat{background:var(--panel2);border-radius:14px;padding:13px}.stat b{font-size:20px;display:block}
+    .stat span{color:var(--muted);font-size:12px}
+    .track{height:220px;border-radius:16px;background:#0b1118;position:relative;overflow:hidden;border:1px solid #263442}
+    .track svg{width:100%;height:100%}
+    .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
+    .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
+    .advice{display:grid;gap:10px}
+    .tip{padding:13px;border-radius:13px;background:var(--panel2);border-left:4px solid var(--accent)}
+    .tip strong{display:block;margin-bottom:4px}.tip span{color:var(--muted);font-size:13px;line-height:1.4}
+    footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 18px 28px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.hero h2{font-size:22px}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark">P1</div>
+    <div><h1>Road to P1 Dynamics</h1><div class="sub">Data • Performance • Coaching IA</div></div>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <h2>Transformer chaque roulage en progrès mesurable.</h2>
+    <p>Prototype tablette pour Aaron et Lara : import Alfano 7, comparaison des tours,
+      visualisation des zones de gain/perte et conseils de pilotage.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Nouvelle analyse</h3>
+      <label for="driver">Pilote</label>
+      <select id="driver"><option>Aaron</option><option>Lara</option></select>
+      <label for="session">Fichier Alfano 7</label>
+      <input id="session" type="file" accept=".zip,.csv,.json" />
+      <button class="primary" id="analyze">Analyser la séance</button>
+    </div>
+
+    <div class="card">
+      <h3>Résumé de séance — démonstration</h3>
+      <div class="stats">
+        <div class="stat"><b>52.84</b><span>Meilleur tour</span></div>
+        <div class="stat"><b>0.63 s</b><span>Potentiel estimé</span></div>
+        <div class="stat"><b>87 %</b><span>Régularité</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h3>Carte performance</h3>
+      <div class="track">
+        <svg viewBox="0 0 600 330" aria-label="Représentation de circuit">
+          <path d="M92,230 C35,165 78,75 164,67 C247,60 251,126 323,121
+                   C409,116 474,55 535,96 C592,134 549,211 486,218
+                   C424,226 401,286 325,284 C250,282 223,232 166,252
+                   C132,264 112,252 92,230 Z"
+                fill="none" stroke="#2d3b4a" stroke-width="25" stroke-linecap="round"/>
+          <path d="M92,230 C35,165 78,75 164,67 C247,60 251,126 323,121"
+                fill="none" stroke="#32d583" stroke-width="10" stroke-linecap="round"/>
+          <path d="M323,121 C409,116 474,55 535,96 C592,134 549,211 486,218"
+                fill="none" stroke="#ff5f57" stroke-width="10" stroke-linecap="round"/>
+          <path d="M486,218 C424,226 401,286 325,284 C250,282 223,232 166,252 C132,264 112,252 92,230"
+                fill="none" stroke="#f4c430" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="92" cy="230" r="8" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--good)"></i>Gain</span>
+        <span><i class="dot" style="background:var(--bad)"></i>Perte</span>
+        <span><i class="dot" style="background:var(--accent)"></i>À optimiser</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Conseils ingénieur IA — démonstration</h3>
+      <div class="advice">
+        <div class="tip"><strong>Virage 3</strong><span>Freinage relâché trop tard : viser une remise des gaz plus précoce et plus progressive.</span></div>
+        <div class="tip"><strong>Enchaînement 5–6</strong><span>La trajectoire est régulière, mais l'entrée peut être légèrement sacrifiée pour améliorer la sortie.</span></div>
+        <div class="tip"><strong>Priorité séance suivante</strong><span>Travailler deux repères fixes : début de freinage et point de corde du virage le plus lent.</span></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>Road to P1 Dynamics — Prototype V0.1</footer>
+
+<script>
+  document.getElementById('analyze').addEventListener('click', () => {
+    const file = document.getElementById('session').files[0];
+    const driver = document.getElementById('driver').value;
+    if (!file) {
+      alert('Sélectionnez d’abord un fichier Alfano 7.');
+      return;
+    }
+    alert('Fichier « ' + file.name + ' » chargé pour ' + driver +
+      '.\n\nLe moteur réel d’analyse sera ajouté dans la prochaine version.');
+  });
+</script>
+</body>
+</html>
