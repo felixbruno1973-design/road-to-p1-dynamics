@@ -1,136 +1,125 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0f14" />
-  <title>Road to P1 Dynamics</title>
-  <style>
-    :root{
-      --bg:#090d12;--panel:#111821;--panel2:#17212d;--text:#f4f7fb;--muted:#9cabba;
-      --accent:#f4c430;--line:#263342;--good:#32d583;--bad:#ff5f57;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#070a0e,#0c1219 55%,#091017);color:var(--text);
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh}
-    header{padding:22px 18px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;
-      background:rgba(9,13,18,.94);backdrop-filter:blur(10px);z-index:4}
-    .brand{display:flex;align-items:center;gap:12px;max-width:1100px;margin:auto}
-    .mark{width:46px;height:46px;border-radius:14px;background:var(--accent);color:#111;display:grid;
-      place-items:center;font-weight:900;font-size:20px;box-shadow:0 8px 30px rgba(244,196,48,.22)}
-    h1{font-size:20px;margin:0}.sub{color:var(--muted);font-size:13px;margin-top:3px}
-    main{max-width:1100px;margin:auto;padding:18px;display:grid;gap:16px}
-    .hero{background:radial-gradient(circle at 85% 15%,rgba(244,196,48,.17),transparent 34%),var(--panel);
-      border:1px solid var(--line);border-radius:22px;padding:20px}
-    .hero h2{margin:0 0 8px;font-size:25px}.hero p{margin:0;color:var(--muted);line-height:1.5}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px}
-    .card h3{margin:0 0 12px;font-size:16px}
-    label{display:block;color:var(--muted);font-size:13px;margin:12px 0 7px}
-    select,input{width:100%;background:var(--panel2);color:var(--text);border:1px solid #334255;
-      border-radius:12px;padding:13px;font-size:15px}
-    button{border:0;border-radius:13px;padding:13px 16px;font-weight:800;font-size:15px;cursor:pointer}
-    .primary{width:100%;margin-top:15px;background:var(--accent);color:#111}
-    .secondary{background:var(--panel2);color:var(--text);border:1px solid #334255}
-    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-    .stat{background:var(--panel2);border-radius:14px;padding:13px}.stat b{font-size:20px;display:block}
-    .stat span{color:var(--muted);font-size:12px}
-    .track{height:220px;border-radius:16px;background:#0b1118;position:relative;overflow:hidden;border:1px solid #263442}
-    .track svg{width:100%;height:100%}
-    .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:10px}
-    .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:5px}
-    .advice{display:grid;gap:10px}
-    .tip{padding:13px;border-radius:13px;background:var(--panel2);border-left:4px solid var(--accent)}
-    .tip strong{display:block;margin-bottom:4px}.tip span{color:var(--muted);font-size:13px;line-height:1.4}
-    footer{text-align:center;color:var(--muted);font-size:12px;padding:8px 18px 28px}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.hero h2{font-size:22px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090d12">
+<title>Road to P1 Dynamics</title>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<style>
+:root{--bg:#080c11;--panel:#111821;--panel2:#17212d;--line:#283646;--text:#f5f7fa;--muted:#9eacba;--yellow:#f2c230;--green:#32d583;--red:#ff6b63;--blue:#5ca8ff}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#070a0e,#0c131b);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(8,12,17,.94);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
+.head{max-width:1150px;margin:auto;padding:15px 18px;display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:14px;background:var(--yellow);color:#111;display:grid;place-items:center;font-weight:900}.title b{display:block;font-size:18px}.title span{font-size:12px;color:var(--muted)}
+main{max-width:1150px;margin:auto;padding:18px;display:grid;gap:15px}.hero,.card{background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:17px}.hero{background:radial-gradient(circle at 85% 10%,rgba(242,194,48,.17),transparent 32%),var(--panel)}
+h1{font-size:23px;margin:0 0 7px}.hero p{margin:0;color:var(--muted);line-height:1.45}.upload{border:1px dashed #45586d;border-radius:16px;padding:18px;text-align:center;margin-top:15px;background:#0d141c}
+input[type=file]{width:100%;max-width:530px}.btn{margin-top:12px;background:var(--yellow);border:0;border-radius:13px;padding:12px 17px;font-weight:850;font-size:15px;cursor:pointer}.btn:disabled{opacity:.5}
+.status{margin-top:10px;color:var(--muted);font-size:13px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.hidden{display:none!important}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:var(--panel2);border-radius:13px;padding:12px}.metric strong{display:block;font-size:19px}.metric span{font-size:11px;color:var(--muted)}
+h2{font-size:16px;margin:0 0 12px}.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:14px}.meta div{background:var(--panel2);padding:10px;border-radius:11px}.meta small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
+.channels{display:flex;flex-wrap:wrap;gap:8px}.chip{border-radius:999px;padding:7px 10px;background:var(--panel2);font-size:12px;border:1px solid #344559}.chip.ok{border-color:rgba(50,213,131,.55);color:#c5ffe2}
+.tablewrap{overflow:auto;border-radius:13px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;min-width:680px;font-size:13px}th,td{padding:10px;text-align:right;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:center}th{position:sticky;top:0;background:#17212d;color:var(--muted)}tr.best{background:rgba(50,213,131,.10)}
+.chart{height:270px;background:#0c131a;border:1px solid var(--line);border-radius:14px;padding:10px}.chart svg{width:100%;height:100%}.note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:9px}
+.warning{border-left:4px solid var(--yellow);padding:11px 12px;background:var(--panel2);border-radius:10px;font-size:13px;line-height:1.45}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.meta{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
-<header>
-  <div class="brand">
-    <div class="mark">P1</div>
-    <div><h1>Road to P1 Dynamics</h1><div class="sub">Data • Performance • Coaching IA</div></div>
-  </div>
-</header>
-
+<header><div class="head"><div class="logo">P1</div><div class="title"><b>Road to P1 Dynamics</b><span>Import Alfano 7 — V0.2</span></div></div></header>
 <main>
-  <section class="hero">
-    <h2>Transformer chaque roulage en progrès mesurable.</h2>
-    <p>Prototype tablette pour Aaron et Lara : import Alfano 7, comparaison des tours,
-      visualisation des zones de gain/perte et conseils de pilotage.</p>
-  </section>
+<section class="hero">
+<h1>Première lecture réelle des fichiers Alfano 7</h1>
+<p>Charge une archive ZIP Alfano. L’analyse reste entièrement dans le navigateur de la tablette : le fichier n’est pas envoyé vers un serveur.</p>
+<div class="upload">
+<input id="file" type="file" accept=".zip">
+<br><button id="load" class="btn">Lire la séance</button>
+<div id="status" class="status">Sélectionne un fichier ZIP Alfano 7.</div>
+</div>
+</section>
 
-  <section class="grid">
-    <div class="card">
-      <h3>Nouvelle analyse</h3>
-      <label for="driver">Pilote</label>
-      <select id="driver"><option>Aaron</option><option>Lara</option></select>
-      <label for="session">Fichier Alfano 7</label>
-      <input id="session" type="file" accept=".zip,.csv,.json" />
-      <button class="primary" id="analyze">Analyser la séance</button>
-    </div>
+<section id="result" class="hidden">
+<div class="metrics">
+<div class="metric"><strong id="laps">—</strong><span>Tours enregistrés</span></div>
+<div class="metric"><strong id="best">—</strong><span>Meilleur tour</span></div>
+<div class="metric"><strong id="maxspeed">—</strong><span>Vitesse GPS maxi</span></div>
+<div class="metric"><strong id="maxtemp">—</strong><span>Température T1 maxi</span></div>
+</div>
 
-    <div class="card">
-      <h3>Résumé de séance — démonstration</h3>
-      <div class="stats">
-        <div class="stat"><b>52.84</b><span>Meilleur tour</span></div>
-        <div class="stat"><b>0.63 s</b><span>Potentiel estimé</span></div>
-        <div class="stat"><b>87 %</b><span>Régularité</span></div>
-      </div>
-    </div>
-  </section>
+<div class="grid2" style="margin-top:15px">
+<div class="card"><h2>Informations de séance</h2><div class="meta">
+<div><small>Pilote</small><b id="driver">—</b></div><div><small>Circuit</small><b id="track">—</b></div>
+<div><small>Date</small><b id="date">—</b></div><div><small>Alfano</small><b id="device">—</b></div>
+</div></div>
+<div class="card"><h2>Canaux détectés</h2><div id="channels" class="channels"></div>
+<p class="note">La présence d’un nom de canal confirme son export. La qualité et l’étalonnage des valeurs seront contrôlés dans le prochain module.</p></div>
+</div>
 
-  <section class="grid">
-    <div class="card">
-      <h3>Carte performance</h3>
-      <div class="track">
-        <svg viewBox="0 0 600 330" aria-label="Représentation de circuit">
-          <path d="M92,230 C35,165 78,75 164,67 C247,60 251,126 323,121
-                   C409,116 474,55 535,96 C592,134 549,211 486,218
-                   C424,226 401,286 325,284 C250,282 223,232 166,252
-                   C132,264 112,252 92,230 Z"
-                fill="none" stroke="#2d3b4a" stroke-width="25" stroke-linecap="round"/>
-          <path d="M92,230 C35,165 78,75 164,67 C247,60 251,126 323,121"
-                fill="none" stroke="#32d583" stroke-width="10" stroke-linecap="round"/>
-          <path d="M323,121 C409,116 474,55 535,96 C592,134 549,211 486,218"
-                fill="none" stroke="#ff5f57" stroke-width="10" stroke-linecap="round"/>
-          <path d="M486,218 C424,226 401,286 325,284 C250,282 223,232 166,252 C132,264 112,252 92,230"
-                fill="none" stroke="#f4c430" stroke-width="10" stroke-linecap="round"/>
-          <circle cx="92" cy="230" r="8" fill="#fff"/>
-        </svg>
-      </div>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--good)"></i>Gain</span>
-        <span><i class="dot" style="background:var(--bad)"></i>Perte</span>
-        <span><i class="dot" style="background:var(--accent)"></i>À optimiser</span>
-      </div>
-    </div>
+<div class="grid2" style="margin-top:15px">
+<div class="card"><h2>Évolution des chronos</h2><div id="chart" class="chart"></div></div>
+<div class="card"><h2>Première lecture automatique</h2><div id="insight" class="warning"></div></div>
+</div>
 
-    <div class="card">
-      <h3>Conseils ingénieur IA — démonstration</h3>
-      <div class="advice">
-        <div class="tip"><strong>Virage 3</strong><span>Freinage relâché trop tard : viser une remise des gaz plus précoce et plus progressive.</span></div>
-        <div class="tip"><strong>Enchaînement 5–6</strong><span>La trajectoire est régulière, mais l'entrée peut être légèrement sacrifiée pour améliorer la sortie.</span></div>
-        <div class="tip"><strong>Priorité séance suivante</strong><span>Travailler deux repères fixes : début de freinage et point de corde du virage le plus lent.</span></div>
-      </div>
-    </div>
-  </section>
+<div class="card" style="margin-top:15px"><h2>Tableau des tours</h2><div class="tablewrap"><table>
+<thead><tr><th>Tour</th><th>Temps</th><th>Écart</th><th>RPM max</th><th>Vitesse max</th><th>T1 max</th></tr></thead>
+<tbody id="rows"></tbody>
+</table></div></div>
+</section>
 </main>
 
-<footer>Road to P1 Dynamics — Prototype V0.1</footer>
-
 <script>
-  document.getElementById('analyze').addEventListener('click', () => {
-    const file = document.getElementById('session').files[0];
-    const driver = document.getElementById('driver').value;
-    if (!file) {
-      alert('Sélectionnez d’abord un fichier Alfano 7.');
-      return;
-    }
-    alert('Fichier « ' + file.name + ' » chargé pour ' + driver +
-      '.\n\nLe moteur réel d’analyse sera ajouté dans la prochaine version.');
-  });
+const $=id=>document.getElementById(id);
+function csvLine(line){return line.split(',').map(v=>v.trim())}
+function sec(v){return Number(v)/1000}
+function lapTime(v){const s=sec(v); const m=Math.floor(s/60); return m?`${m}:${(s-m*60).toFixed(3).padStart(6,'0')}`:`${s.toFixed(3)} s`}
+function speed(v){return (Number(v)/10).toFixed(1)}
+function temp(v){return (Number(v)/10).toFixed(1)}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function drawChart(laps,best){
+ const w=700,h=245,p=35, vals=laps.map(x=>sec(x.time));
+ const min=Math.min(...vals),max=Math.max(...vals), span=Math.max(max-min,.5);
+ const pts=vals.map((v,i)=>[p+i*(w-2*p)/Math.max(vals.length-1,1), h-p-(v-min)*(h-2*p)/span]);
+ let grid=''; for(let i=0;i<4;i++){let y=p+i*(h-2*p)/3;grid+=`<line x1="${p}" y1="${y}" x2="${w-p}" y2="${y}" stroke="#263646"/><text x="3" y="${y+4}" fill="#8998a7" font-size="11">${(max-i*span/3).toFixed(2)}</text>`}
+ const poly=pts.map(p=>p.join(',')).join(' ');
+ const circles=pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="${laps[i].time==best?6:4}" fill="${laps[i].time==best?'#32d583':'#f2c230'}"><title>Tour ${laps[i].lap}: ${lapTime(laps[i].time)}</title></circle>`).join('');
+ $('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}<polyline points="${poly}" fill="none" stroke="#f2c230" stroke-width="3"/>${circles}</svg>`;
+}
+
+$('load').onclick=async()=>{
+ const file=$('file').files[0]; if(!file){$('status').textContent='Choisis d’abord un fichier ZIP.';return}
+ $('load').disabled=true;$('status').textContent='Lecture et analyse en cours…';
+ try{
+   const zip=await JSZip.loadAsync(file);
+   const names=Object.keys(zip.files);
+   const summaryName=names.find(n=>/^SN\d+.*\.csv$/i.test(n.split('/').pop()));
+   const lapName=names.find(n=>/^LAP_\d+.*\.csv$/i.test(n.split('/').pop()));
+   if(!summaryName) throw new Error('Fichier récapitulatif Alfano introuvable.');
+   const txt=await zip.file(summaryName).async('string');
+   const lines=txt.replace(/\r/g,'').split('\n').filter(Boolean);
+   const meta=csvLine(lines[0]), headers=csvLine(lines[1]);
+   const laps=lines.slice(2).map(l=>csvLine(l)).filter(a=>a.length>5 && /^\d+$/.test(a[0])).map(a=>({
+     lap:+a[0],time:+a[1],minrpm:+a[8],maxrpm:+a[9],minspeed:+a[10],maxspeed:+a[11],mint1:+a[12],maxt1:+a[13]
+   }));
+   if(!laps.length) throw new Error('Aucun tour exploitable trouvé.');
+   let detailHeaders=[];
+   if(lapName){const d=await zip.file(lapName).async('string');detailHeaders=csvLine(d.replace(/\r/g,'').split('\n')[0])}
+   const best=Math.min(...laps.map(x=>x.time));
+   const bestLap=laps.find(x=>x.time===best);
+   const maxSp=Math.max(...laps.map(x=>x.maxspeed));
+   const maxT=Math.max(...laps.map(x=>x.maxt1));
+   $('laps').textContent=laps.length;$('best').textContent=lapTime(best);$('maxspeed').textContent=speed(maxSp)+' km/h';$('maxtemp').textContent=temp(maxT)+' °C';
+   $('driver').textContent=meta[5]||'—';$('track').textContent=meta[4]||'—';$('date').textContent=(meta[0]||'')+' '+(meta[1]||'');$('device').textContent=(meta[10]||'ALFANO 7')+' — SN '+(meta[3]||'');
+   const desired=['RPM','Speed GPS','T1','Gf. X','Gf. Y','Gf. Z','Steering Wheel','Gas','Brake','Orientation','Speed GPS 25Hz','Lat.','Lon.','Altitude'];
+   $('channels').innerHTML=desired.filter(x=>detailHeaders.includes(x)).map(x=>`<span class="chip ok">✓ ${escapeHtml(x)}</span>`).join('');
+   $('rows').innerHTML=laps.map(x=>`<tr class="${x.time===best?'best':''}"><td>${x.lap}</td><td>${lapTime(x.time)}</td><td>+${sec(x.time-best).toFixed(3)} s</td><td>${x.maxrpm}</td><td>${speed(x.maxspeed)} km/h</td><td>${temp(x.maxt1)} °C</td></tr>`).join('');
+   const valid=laps.filter(x=>x.time<best*1.25); const first=valid[0],last=valid[valid.length-1];
+   let msg=`Meilleur tour : <b>tour ${bestLap.lap}</b> en <b>${lapTime(best)}</b>. `;
+   if(first&&last&&first!==last){const gain=sec(first.time-last.time);msg+=gain>0?`Entre le premier tour représentatif et le dernier, le gain est de <b>${gain.toFixed(3)} s</b>. `:`Le dernier tour est <b>${Math.abs(gain).toFixed(3)} s</b> plus lent que le premier tour représentatif. `}
+   msg+=`La prochaine étape comparera le meilleur tour aux autres point par point grâce au GPS, au frein, à l’accélérateur et au volant.`;
+   $('insight').innerHTML=msg;
+   drawChart(laps,best);$('result').classList.remove('hidden');$('status').textContent='Séance lue avec succès.';
+ }catch(e){console.error(e);$('status').textContent='Erreur : '+e.message}
+ finally{$('load').disabled=false}
+};
 </script>
-</body>
-</html>
+</body></html>
