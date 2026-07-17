@@ -1,125 +1,21 @@
-<!doctype html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#090d12">
-<title>Road to P1 Dynamics</title>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-<style>
-:root{--bg:#080c11;--panel:#111821;--panel2:#17212d;--line:#283646;--text:#f5f7fa;--muted:#9eacba;--yellow:#f2c230;--green:#32d583;--red:#ff6b63;--blue:#5ca8ff}
-*{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#070a0e,#0c131b);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
-header{position:sticky;top:0;z-index:5;background:rgba(8,12,17,.94);backdrop-filter:blur(9px);border-bottom:1px solid var(--line)}
-.head{max-width:1150px;margin:auto;padding:15px 18px;display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:14px;background:var(--yellow);color:#111;display:grid;place-items:center;font-weight:900}.title b{display:block;font-size:18px}.title span{font-size:12px;color:var(--muted)}
-main{max-width:1150px;margin:auto;padding:18px;display:grid;gap:15px}.hero,.card{background:var(--panel);border:1px solid var(--line);border-radius:19px;padding:17px}.hero{background:radial-gradient(circle at 85% 10%,rgba(242,194,48,.17),transparent 32%),var(--panel)}
-h1{font-size:23px;margin:0 0 7px}.hero p{margin:0;color:var(--muted);line-height:1.45}.upload{border:1px dashed #45586d;border-radius:16px;padding:18px;text-align:center;margin-top:15px;background:#0d141c}
-input[type=file]{width:100%;max-width:530px}.btn{margin-top:12px;background:var(--yellow);border:0;border-radius:13px;padding:12px 17px;font-weight:850;font-size:15px;cursor:pointer}.btn:disabled{opacity:.5}
-.status{margin-top:10px;color:var(--muted);font-size:13px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.hidden{display:none!important}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:var(--panel2);border-radius:13px;padding:12px}.metric strong{display:block;font-size:19px}.metric span{font-size:11px;color:var(--muted)}
-h2{font-size:16px;margin:0 0 12px}.meta{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:14px}.meta div{background:var(--panel2);padding:10px;border-radius:11px}.meta small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}
-.channels{display:flex;flex-wrap:wrap;gap:8px}.chip{border-radius:999px;padding:7px 10px;background:var(--panel2);font-size:12px;border:1px solid #344559}.chip.ok{border-color:rgba(50,213,131,.55);color:#c5ffe2}
-.tablewrap{overflow:auto;border-radius:13px;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;min-width:680px;font-size:13px}th,td{padding:10px;text-align:right;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:center}th{position:sticky;top:0;background:#17212d;color:var(--muted)}tr.best{background:rgba(50,213,131,.10)}
-.chart{height:270px;background:#0c131a;border:1px solid var(--line);border-radius:14px;padding:10px}.chart svg{width:100%;height:100%}.note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:9px}
-.warning{border-left:4px solid var(--yellow);padding:11px 12px;background:var(--panel2);border-radius:10px;font-size:13px;line-height:1.45}
-@media(max-width:760px){.grid2{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.meta{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<header><div class="head"><div class="logo">P1</div><div class="title"><b>Road to P1 Dynamics</b><span>Import Alfano 7 — V0.2</span></div></div></header>
-<main>
-<section class="hero">
-<h1>Première lecture réelle des fichiers Alfano 7</h1>
-<p>Charge une archive ZIP Alfano. L’analyse reste entièrement dans le navigateur de la tablette : le fichier n’est pas envoyé vers un serveur.</p>
-<div class="upload">
-<input id="file" type="file" accept=".zip">
-<br><button id="load" class="btn">Lire la séance</button>
-<div id="status" class="status">Sélectionne un fichier ZIP Alfano 7.</div>
-</div>
-</section>
-
-<section id="result" class="hidden">
-<div class="metrics">
-<div class="metric"><strong id="laps">—</strong><span>Tours enregistrés</span></div>
-<div class="metric"><strong id="best">—</strong><span>Meilleur tour</span></div>
-<div class="metric"><strong id="maxspeed">—</strong><span>Vitesse GPS maxi</span></div>
-<div class="metric"><strong id="maxtemp">—</strong><span>Température T1 maxi</span></div>
-</div>
-
-<div class="grid2" style="margin-top:15px">
-<div class="card"><h2>Informations de séance</h2><div class="meta">
-<div><small>Pilote</small><b id="driver">—</b></div><div><small>Circuit</small><b id="track">—</b></div>
-<div><small>Date</small><b id="date">—</b></div><div><small>Alfano</small><b id="device">—</b></div>
-</div></div>
-<div class="card"><h2>Canaux détectés</h2><div id="channels" class="channels"></div>
-<p class="note">La présence d’un nom de canal confirme son export. La qualité et l’étalonnage des valeurs seront contrôlés dans le prochain module.</p></div>
-</div>
-
-<div class="grid2" style="margin-top:15px">
-<div class="card"><h2>Évolution des chronos</h2><div id="chart" class="chart"></div></div>
-<div class="card"><h2>Première lecture automatique</h2><div id="insight" class="warning"></div></div>
-</div>
-
-<div class="card" style="margin-top:15px"><h2>Tableau des tours</h2><div class="tablewrap"><table>
-<thead><tr><th>Tour</th><th>Temps</th><th>Écart</th><th>RPM max</th><th>Vitesse max</th><th>T1 max</th></tr></thead>
-<tbody id="rows"></tbody>
-</table></div></div>
-</section>
-</main>
-
-<script>
-const $=id=>document.getElementById(id);
-function csvLine(line){return line.split(',').map(v=>v.trim())}
-function sec(v){return Number(v)/1000}
-function lapTime(v){const s=sec(v); const m=Math.floor(s/60); return m?`${m}:${(s-m*60).toFixed(3).padStart(6,'0')}`:`${s.toFixed(3)} s`}
-function speed(v){return (Number(v)/10).toFixed(1)}
-function temp(v){return (Number(v)/10).toFixed(1)}
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-
-function drawChart(laps,best){
- const w=700,h=245,p=35, vals=laps.map(x=>sec(x.time));
- const min=Math.min(...vals),max=Math.max(...vals), span=Math.max(max-min,.5);
- const pts=vals.map((v,i)=>[p+i*(w-2*p)/Math.max(vals.length-1,1), h-p-(v-min)*(h-2*p)/span]);
- let grid=''; for(let i=0;i<4;i++){let y=p+i*(h-2*p)/3;grid+=`<line x1="${p}" y1="${y}" x2="${w-p}" y2="${y}" stroke="#263646"/><text x="3" y="${y+4}" fill="#8998a7" font-size="11">${(max-i*span/3).toFixed(2)}</text>`}
- const poly=pts.map(p=>p.join(',')).join(' ');
- const circles=pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="${laps[i].time==best?6:4}" fill="${laps[i].time==best?'#32d583':'#f2c230'}"><title>Tour ${laps[i].lap}: ${lapTime(laps[i].time)}</title></circle>`).join('');
- $('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}<polyline points="${poly}" fill="none" stroke="#f2c230" stroke-width="3"/>${circles}</svg>`;
-}
-
-$('load').onclick=async()=>{
- const file=$('file').files[0]; if(!file){$('status').textContent='Choisis d’abord un fichier ZIP.';return}
- $('load').disabled=true;$('status').textContent='Lecture et analyse en cours…';
- try{
-   const zip=await JSZip.loadAsync(file);
-   const names=Object.keys(zip.files);
-   const summaryName=names.find(n=>/^SN\d+.*\.csv$/i.test(n.split('/').pop()));
-   const lapName=names.find(n=>/^LAP_\d+.*\.csv$/i.test(n.split('/').pop()));
-   if(!summaryName) throw new Error('Fichier récapitulatif Alfano introuvable.');
-   const txt=await zip.file(summaryName).async('string');
-   const lines=txt.replace(/\r/g,'').split('\n').filter(Boolean);
-   const meta=csvLine(lines[0]), headers=csvLine(lines[1]);
-   const laps=lines.slice(2).map(l=>csvLine(l)).filter(a=>a.length>5 && /^\d+$/.test(a[0])).map(a=>({
-     lap:+a[0],time:+a[1],minrpm:+a[8],maxrpm:+a[9],minspeed:+a[10],maxspeed:+a[11],mint1:+a[12],maxt1:+a[13]
-   }));
-   if(!laps.length) throw new Error('Aucun tour exploitable trouvé.');
-   let detailHeaders=[];
-   if(lapName){const d=await zip.file(lapName).async('string');detailHeaders=csvLine(d.replace(/\r/g,'').split('\n')[0])}
-   const best=Math.min(...laps.map(x=>x.time));
-   const bestLap=laps.find(x=>x.time===best);
-   const maxSp=Math.max(...laps.map(x=>x.maxspeed));
-   const maxT=Math.max(...laps.map(x=>x.maxt1));
-   $('laps').textContent=laps.length;$('best').textContent=lapTime(best);$('maxspeed').textContent=speed(maxSp)+' km/h';$('maxtemp').textContent=temp(maxT)+' °C';
-   $('driver').textContent=meta[5]||'—';$('track').textContent=meta[4]||'—';$('date').textContent=(meta[0]||'')+' '+(meta[1]||'');$('device').textContent=(meta[10]||'ALFANO 7')+' — SN '+(meta[3]||'');
-   const desired=['RPM','Speed GPS','T1','Gf. X','Gf. Y','Gf. Z','Steering Wheel','Gas','Brake','Orientation','Speed GPS 25Hz','Lat.','Lon.','Altitude'];
-   $('channels').innerHTML=desired.filter(x=>detailHeaders.includes(x)).map(x=>`<span class="chip ok">✓ ${escapeHtml(x)}</span>`).join('');
-   $('rows').innerHTML=laps.map(x=>`<tr class="${x.time===best?'best':''}"><td>${x.lap}</td><td>${lapTime(x.time)}</td><td>+${sec(x.time-best).toFixed(3)} s</td><td>${x.maxrpm}</td><td>${speed(x.maxspeed)} km/h</td><td>${temp(x.maxt1)} °C</td></tr>`).join('');
-   const valid=laps.filter(x=>x.time<best*1.25); const first=valid[0],last=valid[valid.length-1];
-   let msg=`Meilleur tour : <b>tour ${bestLap.lap}</b> en <b>${lapTime(best)}</b>. `;
-   if(first&&last&&first!==last){const gain=sec(first.time-last.time);msg+=gain>0?`Entre le premier tour représentatif et le dernier, le gain est de <b>${gain.toFixed(3)} s</b>. `:`Le dernier tour est <b>${Math.abs(gain).toFixed(3)} s</b> plus lent que le premier tour représentatif. `}
-   msg+=`La prochaine étape comparera le meilleur tour aux autres point par point grâce au GPS, au frein, à l’accélérateur et au volant.`;
-   $('insight').innerHTML=msg;
-   drawChart(laps,best);$('result').classList.remove('hidden');$('status').textContent='Séance lue avec succès.';
- }catch(e){console.error(e);$('status').textContent='Erreur : '+e.message}
- finally{$('load').disabled=false}
-};
-</script>
-</body></html>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080c11"><title>Road to P1 Dynamics V0.3</title><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script><style>
+:root{--bg:#080c11;--p:#111821;--p2:#17212d;--line:#293849;--txt:#f4f7fb;--mut:#9eacba;--y:#f2c230;--g:#32d583;--r:#ff655f;--b:#58a6ff}*{box-sizing:border-box}body{margin:0;background:linear-gradient(#070a0e,#0c131b);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}header{position:sticky;top:0;z-index:5;background:#080c11ee;border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}.head{max-width:1180px;margin:auto;padding:14px 18px;display:flex;gap:12px;align-items:center}.logo{width:45px;height:45px;border-radius:14px;background:var(--y);color:#111;display:grid;place-items:center;font-weight:900}.brand b{display:block}.brand span{font-size:12px;color:var(--mut)}main{max-width:1180px;margin:auto;padding:18px;display:grid;gap:15px}.card{background:var(--p);border:1px solid var(--line);border-radius:19px;padding:16px}.hero{background:radial-gradient(circle at 90% 10%,#f2c2302c,transparent 30%),var(--p)}h1{font-size:23px;margin:0 0 6px}h2{font-size:16px;margin:0 0 12px}p{color:var(--mut);line-height:1.45}.upload{margin-top:14px;padding:17px;border:1px dashed #465b70;border-radius:15px;text-align:center;background:#0c131b}.btn{border:0;border-radius:12px;background:var(--y);font-weight:850;padding:12px 16px;margin-top:11px}.status{font-size:13px;color:var(--mut);margin-top:9px}.hidden{display:none!important}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{padding:12px;background:var(--p2);border-radius:13px}.metric b{display:block;font-size:19px}.metric span{font-size:11px;color:var(--mut)}.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:15px}.controls{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}label{font-size:12px;color:var(--mut);display:block;margin-bottom:5px}select{width:100%;background:var(--p2);color:var(--txt);border:1px solid #3a4b5e;border-radius:11px;padding:11px}.map{height:430px;background:#091017;border-radius:14px;border:1px solid var(--line);overflow:hidden}.map svg{width:100%;height:100%}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-top:9px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.chart{height:220px;background:#0a1118;border:1px solid var(--line);border-radius:13px;overflow:hidden}.chart svg{width:100%;height:100%}.advice{display:grid;gap:9px}.tip{background:var(--p2);border-left:4px solid var(--y);border-radius:10px;padding:11px;font-size:13px;line-height:1.42}.tip b{display:block;margin-bottom:3px}.tip span{color:var(--mut)}.zones{display:grid;gap:8px}.zone{display:grid;grid-template-columns:64px 1fr 75px;gap:8px;align-items:center;background:var(--p2);padding:9px;border-radius:10px;font-size:12px}.bar{height:8px;background:#29394a;border-radius:99px;overflow:hidden}.fill{height:100%}.small{font-size:12px;color:var(--mut)}@media(max-width:800px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}.controls{grid-template-columns:1fr 1fr}.controls .btn{grid-column:1/-1}.map{height:360px}}
+</style></head><body><header><div class="head"><div class="logo">P1</div><div class="brand"><b>Road to P1 Dynamics</b><span>Comparaison GPS et pilotage — V0.3</span></div></div></header><main>
+<section class="card hero"><h1>Comparer deux tours, mètre par mètre</h1><p>Charge un ZIP Alfano 7. L’application reconstruit la trajectoire, aligne deux tours sur la distance et colore les zones de gain et de perte.</p><div class="upload"><input id="file" type="file" accept=".zip"><br><button class="btn" id="load">Analyser la séance</button><div class="status" id="status">Aucun fichier chargé.</div></div></section>
+<section id="app" class="hidden"><div class="metrics"><div class="metric"><b id="driver">—</b><span>Pilote</span></div><div class="metric"><b id="best">—</b><span>Meilleur tour</span></div><div class="metric"><b id="potential">—</b><span>Écart du tour comparé</span></div><div class="metric"><b id="distance">—</b><span>Distance GPS</span></div></div>
+<div class="card"><div class="controls"><div><label>Tour de référence</label><select id="ref"></select></div><div><label>Tour à comparer</label><select id="cmp"></select></div><button class="btn" id="compare">Comparer</button></div></div>
+<div class="grid"><div class="card"><h2>Carte des gains et pertes</h2><div id="map" class="map"></div><div class="legend"><span><i class="dot" style="background:var(--g)"></i>Le tour comparé gagne</span><span><i class="dot" style="background:var(--r)"></i>Le tour comparé perd</span><span><i class="dot" style="background:var(--y)"></i>Écart faible</span></div><p class="small">Comparaison par progression normalisée sur la distance GPS. L’alignement avancé par ligne de course arrivera en V0.4.</p></div><div class="card"><h2>Lecture ingénieur</h2><div id="advice" class="advice"></div><h2 style="margin-top:18px">Zones principales</h2><div id="zones" class="zones"></div></div></div>
+<div class="grid"><div class="card"><h2>Delta temps cumulé</h2><div id="deltaChart" class="chart"></div></div><div class="card"><h2>Comparaison des commandes</h2><div id="controlChart" class="chart"></div><p class="small">Gaz, frein et volant sont ramenés sur une échelle commune pour visualiser les différences de comportement.</p></div></div></section>
+</main><script>
+const $=x=>document.getElementById(x);let SESSION=null;const split=l=>l.split(',').map(v=>v.trim());const fmt=ms=>(ms/1000).toFixed(3)+' s';
+function hav(a,b){const R=6371000,p=Math.PI/180,dlat=(b.lat-a.lat)*p,dlon=(b.lon-a.lon)*p;const q=Math.sin(dlat/2)**2+Math.cos(a.lat*p)*Math.cos(b.lat*p)*Math.sin(dlon/2)**2;return 2*R*Math.asin(Math.sqrt(q))}
+function parseLap(txt,time,lap){const ls=txt.replace(/\r/g,'').trim().split('\n'),h=split(ls[0]),ix=n=>h.indexOf(n), rows=ls.slice(1).map(split);let pts=rows.map((r,i)=>({lat:+r[ix('Lat.')]/1e6,lon:+r[ix('Lon.')]/1e6,speed:+r[ix('Speed GPS')]/10,gas:+r[ix('Gas')],brake:+r[ix('Brake')],steer:+r[ix('Steering Wheel')],rpm:+r[ix('RPM')],i})).filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&p.lat>40);let d=0;pts.forEach((p,i)=>{if(i)d+=hav(pts[i-1],p);p.d=d;p.t=i/(Math.max(pts.length-1,1))*time/1000});return{lap,time,pts,distance:d}}
+function interp(lap,n=240){const out=[];for(let k=0;k<n;k++){const target=k/(n-1)*lap.distance;let j=1;while(j<lap.pts.length&&lap.pts[j].d<target)j++;const a=lap.pts[Math.max(0,j-1)],b=lap.pts[Math.min(j,lap.pts.length-1)],q=(target-a.d)/Math.max(b.d-a.d,.001);const m=v=>a[v]+(b[v]-a[v])*q;out.push({d:target,lat:m('lat'),lon:m('lon'),speed:m('speed'),gas:m('gas'),brake:m('brake'),steer:m('steer'),t:m('t')})}return out}
+function color(v){return v>.018?'#ff655f':v<-.018?'#32d583':'#f2c230'}
+function compare(){const r=SESSION.laps.find(x=>x.lap==$('ref').value),c=SESSION.laps.find(x=>x.lap==$('cmp').value),A=interp(r),B=interp(c),n=A.length;let del=[];for(let i=0;i<n;i++)del.push(B[i].t-A[i].t);$('potential').textContent=(c.time-r.time>=0?'+':'')+fmt(c.time-r.time);$('distance').textContent=Math.round(r.distance)+' m';drawMap(A,del);drawDelta(del);drawControls(A,B);makeAdvice(A,B,del,r,c)}
+function drawMap(A,D){let xs=A.map(p=>p.lon),ys=A.map(p=>p.lat),minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys),W=760,H=500,pad=35,sc=Math.min((W-2*pad)/(maxx-minx),(H-2*pad)/(maxy-miny));const xy=p=>[pad+(p.lon-minx)*sc,H-pad-(p.lat-miny)*sc];let seg='';for(let i=1;i<A.length;i++){let a=xy(A[i-1]),b=xy(A[i]);seg+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${color(D[i]-D[i-1])}" stroke-width="9" stroke-linecap="round"><title>${Math.round(A[i].d)} m — delta ${D[i].toFixed(3)} s</title></line>`}let s=xy(A[0]);$('map').innerHTML=`<svg viewBox="0 0 ${W} ${H}"><g opacity=".3">${seg.replace(/stroke="#[0-9a-f]+"/gi,'stroke="#526476"').replace(/stroke-width="9"/g,'stroke-width="19"')}</g>${seg}<circle cx="${s[0]}" cy="${s[1]}" r="8" fill="#fff"/><text x="${s[0]+12}" y="${s[1]-10}" fill="#fff" font-size="13">Départ</text></svg>`}
+function drawDelta(D){const W=720,H=220,p=28,min=Math.min(...D,0),max=Math.max(...D,0),span=Math.max(max-min,.05),xy=(v,i)=>[p+i*(W-2*p)/(D.length-1),H-p-(v-min)*(H-2*p)/span],pts=D.map(xy).map(q=>q.join(',')).join(' '),zero=xy(0,0)[1];$('deltaChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><line x1="${p}" y1="${zero}" x2="${W-p}" y2="${zero}" stroke="#596879"/><polyline points="${pts}" fill="none" stroke="#f2c230" stroke-width="3"/><text x="4" y="18" fill="#9eacba" font-size="11">${max.toFixed(2)} s</text><text x="4" y="${H-8}" fill="#9eacba" font-size="11">${min.toFixed(2)} s</text></svg>`}
+function drawControls(A,B){const W=720,H=220,p=24,n=A.length,series=[['gas','#32d583',1000],['brake','#ff655f',1000],['steer','#58a6ff',1000]],lines=[];for(const [key,col,scale] of series){let pts=B.map((v,i)=>[p+i*(W-2*p)/(n-1),H-p-Math.min(1,Math.abs(v[key])/scale)*(H-2*p)]).map(q=>q.join(',')).join(' ');lines.push(`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="2" opacity=".9"/>`)}$('controlChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${lines.join('')}<text x="12" y="18" fill="#32d583" font-size="11">Gaz</text><text x="55" y="18" fill="#ff655f" font-size="11">Frein</text><text x="104" y="18" fill="#58a6ff" font-size="11">Volant</text></svg>`}
+function makeAdvice(A,B,D,r,c){let chunks=[],m=12;for(let k=0;k<m;k++){let i0=Math.floor(k*D.length/m),i1=Math.floor((k+1)*D.length/m),gain=D[i1-1]-D[i0],avg=(key,X)=>X.slice(i0,i1).reduce((s,p)=>s+p[key],0)/(i1-i0);chunks.push({k,gain,d0:A[i0].d,d1:A[i1-1].d,sp:avg('speed',B)-avg('speed',A),gas:avg('gas',B)-avg('gas',A),brake:avg('brake',B)-avg('brake',A)})}chunks.sort((a,b)=>b.gain-a.gain);let worst=chunks.slice(0,3),best=[...chunks].sort((a,b)=>a.gain-b.gain)[0];$('advice').innerHTML=`<div class="tip"><b>Priorité n°1 : ${Math.round(worst[0].d0)}–${Math.round(worst[0].d1)} m</b><span>Perte d’environ ${(worst[0].gain).toFixed(3)} s. ${worst[0].brake>40?'Frein davantage sollicité. ':''}${worst[0].gas<-40?'Remise des gaz plus faible ou plus tardive. ':''}${worst[0].sp<0?'Vitesse moyenne inférieure de '+Math.abs(worst[0].sp).toFixed(1)+' km/h.':''}</span></div><div class="tip"><b>Meilleure zone : ${Math.round(best.d0)}–${Math.round(best.d1)} m</b><span>Gain d’environ ${Math.abs(best.gain).toFixed(3)} s sur cette portion.</span></div><div class="tip"><b>Écart final</b><span>Tour ${c.lap} : ${fmt(c.time)} contre tour ${r.lap} : ${fmt(r.time)}.</span></div>`;$('zones').innerHTML=worst.map((z,i)=>`<div class="zone"><b>Zone ${i+1}</b><div class="bar"><div class="fill" style="width:${Math.min(100,Math.abs(z.gain)*500)}%;background:${z.gain>0?'var(--r)':'var(--g)'}"></div></div><span>+${z.gain.toFixed(3)} s</span></div>`).join('')}
+$('load').onclick=async()=>{let f=$('file').files[0];if(!f)return $('status').textContent='Sélectionne un ZIP Alfano.';$('status').textContent='Lecture des tours et du GPS…';try{let z=await JSZip.loadAsync(f),names=Object.keys(z.files),sum=names.find(n=>/^SN\d+.*\.csv$/i.test(n.split('/').pop())),txt=await z.file(sum).async('string'),ls=txt.replace(/\r/g,'').split('\n').filter(Boolean),meta=split(ls[0]),times={};ls.slice(2).forEach(l=>{let a=split(l);if(/^\d+$/.test(a[0]))times[+a[0]]=+a[1]});let laps=[];for(const name of names.filter(n=>/^LAP_\d+.*\.csv$/i.test(n.split('/').pop()))){let no=+name.split('/').pop().match(/^LAP_(\d+)/i)[1];if(times[no]&&times[no]<65000){laps.push(parseLap(await z.file(name).async('string'),times[no],no))}}laps.sort((a,b)=>a.lap-b.lap);let best=laps.reduce((a,b)=>a.time<b.time?a:b);SESSION={meta,laps};$('driver').textContent=meta[5]||'—';$('best').textContent='T'+best.lap+' · '+fmt(best.time);let opts=laps.map(l=>`<option value="${l.lap}">Tour ${l.lap} — ${fmt(l.time)}</option>`).join('');$('ref').innerHTML=opts;$('cmp').innerHTML=opts;$('ref').value=best.lap;$('cmp').value=(laps.find(l=>l.lap!=best.lap)||best).lap;$('app').classList.remove('hidden');$('status').textContent=`${laps.length} tours exploitables détectés — ${meta[4]||''}`;compare()}catch(e){console.error(e);$('status').textContent='Erreur : '+e.message}};$('compare').onclick=compare;
+</script></body></html>
