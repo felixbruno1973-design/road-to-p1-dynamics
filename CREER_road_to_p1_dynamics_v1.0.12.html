@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Créateur Road to P1 Dynamics V1.0.12</title>
+<style>
+:root{--bg:#05070b;--panel:#111923;--line:#2c394d;--text:#f7f9fc;--muted:#a6b2c2;--red:#ef2438;--green:#2ed183}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 80% 0,rgba(239,36,56,.16),transparent 30%),var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Arial,sans-serif;padding:20px}
+main{width:min(760px,100%);background:linear-gradient(180deg,#17212e,var(--panel));border:1px solid var(--line);border-radius:24px;padding:28px;box-shadow:0 25px 70px rgba(0,0,0,.45)}
+h1{margin:0 0 8px;font-size:30px} h1 b{color:var(--red)} p{color:var(--muted)}
+.box{margin-top:20px;padding:18px;border:1px solid var(--line);border-radius:16px;background:#090e15}
+label,.btn{display:inline-flex;align-items:center;justify-content:center;border-radius:13px;padding:13px 17px;font-weight:850;cursor:pointer}
+label{background:linear-gradient(135deg,var(--red),#b81929)} input{display:none}
+.btn{border:1px solid #36506a;background:#172333;color:white;margin-left:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+#status{margin-top:16px;padding:13px;border-radius:13px;background:#0b1119;border:1px solid var(--line)}
+.ok{color:var(--green)} .bad{color:#ff7b86}
+small{display:block;margin-top:18px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>ROAD TO <b>P1</b> DYNAMICS</h1>
+<p>Créateur du fichier complet <strong>V1.0.12</strong> à partir de la V1.0.11.</p>
+<div class="box">
+  <label for="baseFile">1. Choisir le fichier V1.0.11</label>
+  <input id="baseFile" type="file" accept=".html,text/html">
+  <button id="build" class="btn" disabled>2. Créer la V1.0.12</button>
+  <div id="status">Aucun fichier sélectionné.</div>
+</div>
+<small>Le traitement reste entièrement local sur la tablette. Aucune donnée ni aucun fichier n’est envoyé sur Internet.</small>
+</main>
+<script>
+const embeddedPatch = "/*\nRoad to P1 Dynamics — correctif interface tablette V1.0.12\nBase obligatoire : road_to_p1_dynamics_phase1_v1.0.11.html\n\nCe correctif :\n- clarifie Tour A et Tour B avec leurs chronos ;\n- appelle Tour B « chrono comparé » ;\n- compacte l'écran de comparaison ;\n- garde le bouton Comparer sur la même ligne ;\n- allonge le curseur de déplacement ;\n- ne modifie ni la carte, ni les calculs GPS, ni les trajectoires pointillées.\n*/\n(() => {\n  'use strict';\n\n  const $ = (selector, root = document) => root.querySelector(selector);\n\n  const style = document.createElement('style');\n  style.id = 'rtp1-v1012-tablet-patch';\n  style.textContent = `\n    main{\n      padding-top:12px!important;\n      padding-bottom:24px!important\n    }\n\n    .section{\n      margin-top:12px!important\n    }\n\n    .sectionhead{\n      margin-bottom:7px!important;\n      align-items:center!important\n    }\n\n    .sectionhead h2{\n      font-size:20px!important\n    }\n\n    .card{\n      padding:12px!important;\n      border-radius:17px!important\n    }\n\n    .explain{\n      margin-top:7px!important;\n      padding:9px 11px!important;\n      font-size:12px!important;\n      line-height:1.35!important\n    }\n\n    .filters{\n      gap:8px!important\n    }\n\n    .filters .field{\n      min-width:0!important\n    }\n\n    .field select,\n    .field input{\n      padding:8px 9px!important\n    }\n\n    .btn{\n      padding:9px 12px!important;\n      border-radius:11px!important\n    }\n\n    /* Barre de comparaison compacte */\n    #comparePage > .card.filters{\n      display:grid!important;\n      grid-template-columns:\n        minmax(145px,1.15fr)\n        minmax(105px,.72fr)\n        minmax(145px,1.15fr)\n        minmax(105px,.72fr)\n        auto!important;\n      align-items:end!important;\n      column-gap:8px!important;\n      row-gap:6px!important\n    }\n\n    #drawCompare{\n      align-self:end!important;\n      white-space:nowrap!important;\n      min-height:38px!important\n    }\n\n    /* Répartition graphique / plan */\n    #comparePage .section.grid{\n      gap:9px!important\n    }\n\n    #comparePage .span8{\n      grid-column:span 9!important\n    }\n\n    #comparePage .span4{\n      grid-column:span 3!important\n    }\n\n    #comparePage h3{\n      margin:0 0 7px!important;\n      font-size:16px!important\n    }\n\n    #speedCanvas{\n      height:245px!important\n    }\n\n    #miniTrackCanvas{\n      height:245px!important\n    }\n\n    /* Légendes Tour A / Tour B */\n    .speedlegend{\n      gap:7px!important;\n      margin-bottom:7px!important\n    }\n\n    .legendcard{\n      padding:8px 10px!important;\n      border-radius:11px!important\n    }\n\n    .legendcard strong{\n      font-size:13px!important\n    }\n\n    .legendcard small{\n      font-size:11px!important;\n      white-space:nowrap;\n      overflow:hidden;\n      text-overflow:ellipsis\n    }\n\n    /* Zoom compact */\n    .zoomtools{\n      margin-top:7px!important;\n      padding:7px 9px!important\n    }\n\n    .zoomtools .btn{\n      padding:6px 10px!important\n    }\n\n    /* Curseur plus long et plus précis */\n    .compare-controls{\n      grid-template-columns:\n        auto\n        minmax(460px,2.4fr)\n        minmax(210px,.9fr)!important;\n      gap:8px!important;\n      margin-top:8px!important;\n      align-items:center!important\n    }\n\n    .rangefield{\n      width:100%!important\n    }\n\n    .rangefield input[type=range]{\n      width:100%!important;\n      min-width:420px!important;\n      height:28px!important;\n      padding:0!important\n    }\n\n    .livebox{\n      min-height:48px!important;\n      padding:8px 10px!important;\n      font-size:13px!important\n    }\n\n    #compareExplain{\n      margin-top:7px!important\n    }\n\n    #comparePage .card.span4 .explain{\n      font-size:11px!important\n    }\n\n    @media (max-width:1050px){\n      #comparePage > .card.filters{\n        grid-template-columns:\n          minmax(135px,1fr)\n          minmax(95px,.65fr)\n          minmax(135px,1fr)\n          minmax(95px,.65fr)\n          auto!important\n      }\n\n      .compare-controls{\n        grid-template-columns:\n          auto\n          minmax(350px,2fr)\n          minmax(190px,.85fr)!important\n      }\n\n      .rangefield input[type=range]{\n        min-width:330px!important\n      }\n    }\n\n    /* Tablette paysage */\n    @media (min-width:700px) and (max-width:950px){\n      main{\n        padding-left:10px!important;\n        padding-right:10px!important\n      }\n\n      #comparePage > .card.filters{\n        grid-template-columns:\n          1fr\n          .68fr\n          1fr\n          .68fr\n          auto!important\n      }\n\n      #comparePage .span8{\n        grid-column:span 9!important\n      }\n\n      #comparePage .span4{\n        grid-column:span 3!important\n      }\n\n      #speedCanvas,\n      #miniTrackCanvas{\n        height:220px!important\n      }\n\n      .compare-controls{\n        grid-template-columns:\n          auto\n          minmax(300px,2fr)\n          minmax(180px,.9fr)!important\n      }\n\n      .rangefield input[type=range]{\n        min-width:285px!important\n      }\n\n      .speedlegend{\n        grid-template-columns:1fr 1fr!important\n      }\n    }\n\n    /* Tablette portrait et téléphone */\n    @media (max-width:699px){\n      #comparePage > .card.filters{\n        grid-template-columns:1fr 1fr!important\n      }\n\n      #drawCompare{\n        grid-column:1 / -1!important;\n        width:100%!important\n      }\n\n      #comparePage .span8,\n      #comparePage .span4{\n        grid-column:span 12!important\n      }\n\n      .compare-controls{\n        grid-template-columns:1fr!important\n      }\n\n      .rangefield input[type=range]{\n        min-width:0!important\n      }\n\n      #speedCanvas,\n      #miniTrackCanvas{\n        height:230px!important\n      }\n    }\n  `;\n  document.head.appendChild(style);\n\n  function optionText(select) {\n    if (!select || select.selectedIndex < 0) return '';\n    return select.options[select.selectedIndex]?.textContent || '';\n  }\n\n  function extractChrono(text) {\n    const match = String(text || '').match(\n      /(?:^|\\s)(\\d{1,2}:\\d{2}\\.\\d{3}|\\d{2,3}\\.\\d{3})(?:\\s|$)/\n    );\n    return match ? match[1] : '—';\n  }\n\n  function extractTour(text) {\n    const match = String(text || '').match(/(?:tour|lap)\\s*(\\d+)/i);\n    return match ? `Tour ${match[1]}` : String(text || '').trim() || 'Tour non sélectionné';\n  }\n\n  function updateFieldLabels() {\n    const labels = document.querySelectorAll(\n      '#comparePage > .card.filters .field label'\n    );\n\n    if (labels[0]) labels[0].textContent = 'Séance du tour A';\n    if (labels[1]) labels[1].textContent = 'Tour A — chrono de référence';\n    if (labels[2]) labels[2].textContent = 'Séance du tour B';\n    if (labels[3]) labels[3].textContent = 'Tour B — chrono comparé';\n  }\n\n  function updateLegendCards() {\n    const lapA = $('#lapA');\n    const lapB = $('#lapB');\n    const sessionA = $('#sessionA');\n    const sessionB = $('#sessionB');\n\n    const cardA = $('#speedLegend .tourA');\n    const cardB = $('#speedLegend .tourB');\n\n    if (cardA) {\n      const strong = $('strong', cardA);\n      const small = $('small', cardA);\n      const lapText = optionText(lapA);\n      const sessionText = optionText(sessionA);\n\n      if (strong) {\n        strong.textContent =\n          `Tour A — ${extractTour(lapText)} — ${extractChrono(lapText)}`;\n      }\n\n      if (small) {\n        small.textContent =\n          `Chrono de référence${sessionText ? ` · ${sessionText}` : ''}`;\n      }\n    }\n\n    if (cardB) {\n      const strong = $('strong', cardB);\n      const small = $('small', cardB);\n      const lapText = optionText(lapB);\n      const sessionText = optionText(sessionB);\n\n      if (strong) {\n        strong.textContent =\n          `Tour B — ${extractTour(lapText)} — ${extractChrono(lapText)}`;\n      }\n\n      if (small) {\n        small.textContent =\n          `Chrono comparé${sessionText ? ` · ${sessionText}` : ''}`;\n      }\n    }\n\n    const compareExplain = $('#compareExplain');\n    if (compareExplain) {\n      compareExplain.innerHTML =\n        '<strong>Comment lire :</strong> ' +\n        'Tour A est le chrono de référence. Tour B est le chrono comparé. ' +\n        'La ligne jaune indique précisément l’endroit étudié sur le tour.';\n    }\n\n    const miniExplain = $('#miniTrackExplain');\n    if (miniExplain) {\n      miniExplain.innerHTML =\n        '<strong>Comment lire :</strong> ' +\n        'le point blanc représente le Tour A, chrono de référence. ' +\n        'Le point rouge représente le Tour B, chrono comparé.';\n    }\n  }\n\n  function refreshLabels() {\n    updateFieldLabels();\n    updateLegendCards();\n  }\n\n  document.addEventListener('change', event => {\n    if (\n      event.target &&\n      ['sessionA', 'lapA', 'sessionB', 'lapB'].includes(event.target.id)\n    ) {\n      requestAnimationFrame(refreshLabels);\n    }\n  });\n\n  document.addEventListener('click', event => {\n    if (\n      event.target &&\n      (\n        event.target.id === 'drawCompare' ||\n        event.target.dataset?.page === 'comparePage'\n      )\n    ) {\n      setTimeout(refreshLabels, 80);\n    }\n  });\n\n  const observer = new MutationObserver(() => {\n    if ($('#comparePage')) refreshLabels();\n  });\n\n  observer.observe(document.body, {\n    childList: true,\n    subtree: true\n  });\n\n  refreshLabels();\n})();\n";
+const input = document.getElementById('baseFile');
+const build = document.getElementById('build');
+const status = document.getElementById('status');
+let source = '';
+
+input.addEventListener('change', async () => {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  source = await file.text();
+  const looksRight = /V1\.0\.11|v1\.0\.11/i.test(source) && /Road to P1 Dynamics/i.test(source);
+  build.disabled = !looksRight;
+  status.className = looksRight ? 'ok' : 'bad';
+  status.textContent = looksRight
+    ? 'V1.0.11 reconnue. Le fichier V1.0.12 peut être créé.'
+    : 'Ce fichier ne semble pas être la V1.0.11 de Road to P1 Dynamics.';
+});
+
+build.addEventListener('click', () => {
+  if (!source) return;
+  let result = source
+    .replaceAll('V1.0.11', 'V1.0.12')
+    .replaceAll('v1.0.11', 'v1.0.12')
+    .replaceAll('PHASE 1 · V1.0.11', 'PHASE 1 · V1.0.12');
+
+  const injected = '\n<script>\n' + embeddedPatch + '\n<\/script>\n';
+  if (/<\/body>/i.test(result)) {
+    result = result.replace(/<\/body>/i, injected + '</body>');
+  } else {
+    result += injected;
+  }
+
+  const blob = new Blob([result], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'road_to_p1_dynamics_phase1_v1.0.12.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  status.className = 'ok';
+  status.textContent = 'V1.0.12 créée et téléchargée.';
+});
+</script>
+</body>
+</html>
