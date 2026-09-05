@@ -1,0 +1,117 @@
+name: Apply Focus graph drag V1.0.49
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-focus-graph-drag-v1049.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add bidirectional focus cursor dragging
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          if 'V1.0.49 — déplacement manuel du curseur jaune' in text:
+              raise SystemExit(0)
+
+          text = text.replace('<title>Road to P1 Dynamics — Phase 1 V1.0.48</title>', '<title>Road to P1 Dynamics — Phase 1 V1.0.49</title>', 1)
+          text = text.replace('<div class="ver">PHASE 1 · V1.0.48</div>', '<div class="ver">PHASE 1 · V1.0.49</div>', 1)
+          text = text.replace('<div id="status" class="status"><strong>Prêt.</strong> V1.0.48 : Focus volant aligné à l’identique sur les modules Accélération et Freinage validés.</div>', '<div id="status" class="status"><strong>Prêt.</strong> V1.0.49 : curseur jaune des graphiques déplaçable manuellement et synchronisé avec les points A/B des trajectoires.</div>', 1)
+
+          block = r'''
+<style>
+/* V1.0.49 — déplacement manuel du curseur jaune, synchronisation bidirectionnelle */
+#accelerationPage .focusDataCanvas,
+#brakingPage .focusDataCanvas,
+#steeringPage .focusDataCanvas{
+  cursor:ew-resize;
+  touch-action:none;
+  user-select:none;
+}
+</style>
+<script>
+(function(){
+  const cfg={
+    accelerationPage:{left:38,right:12},
+    brakingPage:{left:38,right:12},
+    steeringPage:{left:48,right:12}
+  };
+  let drag=null;
+
+  function targetInfo(target){
+    const canvas=target&&target.closest?target.closest('.focusDataCanvas'):null;
+    if(!canvas)return null;
+    const page=canvas.closest('.page');
+    if(!page||!cfg[page.id])return null;
+    return {canvas,page,plot:cfg[page.id]};
+  }
+
+  function moveCursor(info,event){
+    const rect=info.canvas.getBoundingClientRect();
+    const left=info.plot.left,right=info.plot.right;
+    const usable=Math.max(1,rect.width-left-right);
+    const localX=Math.max(left,Math.min(rect.width-right,event.clientX-rect.left));
+    const p=(localX-left)/usable;
+    const range=info.page.querySelector('.focusRange');
+    if(!range)return;
+    range.value=Math.round(Math.max(0,Math.min(1,p))*1000);
+    range.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+
+  document.addEventListener('pointerdown',function(event){
+    if(event.pointerType==='mouse'&&event.button!==0)return;
+    const info=targetInfo(event.target);
+    if(!info)return;
+    drag={info,pointerId:event.pointerId};
+    try{info.canvas.setPointerCapture(event.pointerId)}catch(e){}
+    event.preventDefault();
+    moveCursor(info,event);
+  },true);
+
+  document.addEventListener('pointermove',function(event){
+    if(!drag||drag.pointerId!==event.pointerId)return;
+    event.preventDefault();
+    moveCursor(drag.info,event);
+  },true);
+
+  function stopDrag(event){
+    if(!drag||drag.pointerId!==event.pointerId)return;
+    try{drag.info.canvas.releasePointerCapture(event.pointerId)}catch(e){}
+    drag=null;
+  }
+
+  document.addEventListener('pointerup',stopDrag,true);
+  document.addEventListener('pointercancel',stopDrag,true);
+})();
+</script>
+'''
+
+          marker='</body></html>'
+          if marker not in text:
+              raise SystemExit('Fin du document introuvable')
+          text=text.replace(marker,block+'\n'+marker,1)
+          path.write_text(text,encoding='utf-8')
+          PY
+      - name: Commit V1.0.49
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "V1.0.49 enable bidirectional focus graph cursor dragging"
+          git push
